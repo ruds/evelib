@@ -17,6 +17,8 @@
 # This is designed specifically for the mysql dump created by the
 # developers of Eve Online, and is nowhere near general purpose.
 #
+# You should probably prefer eve_mssql_to_sqlite.sh
+#
 # The BEGIN; and COMMIT; lines are very important. With them, a reasonable
 # machine can process the entire DB in less than five minutes. Without them,
 # it could take hours or more.
