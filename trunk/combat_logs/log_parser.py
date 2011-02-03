@@ -30,13 +30,13 @@ class UTC(datetime.tzinfo):
     __ZERO = datetime.timedelta(0)
 
     def utcoffset(self, dt):
-        return __ZERO
+        return self.__ZERO
 
     def tzname(self, dt):
         return "UTC"
 
     def dst(self, dt):
-        return __ZERO
+        return self.__ZERO
 
 
 _TIMESTAMP_PATTERN = (
@@ -59,6 +59,18 @@ class LogEntry(object):
         self._timestamp = timestamp
         self._entry_type = entry_type
         self._data = data
+
+    @property
+    def timestamp(self):
+        return self._timestamp
+
+    @property
+    def entry_type(self):
+        return self._entry_type
+
+    @property
+    def data(self):
+        return self._data
 
     __LOG_LINE_RE = re.compile(
         r'^\[ %s \] \((?P<type>[^)]+)\) (?P<data>.+)$'
@@ -141,14 +153,14 @@ class CombatLogEntry(LogEntry):
         '%(attacker)s perfectly strikes %(target)s, %(damage)s\.$',
         ]
 
-    __ATTACKER_PATTERNS = [ '(?P<attacker>Your) (?:group of )?(?P<weapon>.*)',
-                            '(?P<weapon>.*) belonging to (?P<attacker>.*)',
-                            '(?P<attacker>.*)(?P<weapon>)' ]
+    __ATTACKER_PATTERNS = [ '(?P<attacker>You)r (?:group of )?(?P<weapon>.*?)',
+                            '(?P<weapon>.*?) belonging to (?P<attacker>.*?)',
+                            '(?P<attacker>.*?)(?P<weapon>)' ]
 
     __VERB_PHRASE_RES = [
         re.compile(vp % { 'attacker': '(?:<color[^>]*>)?%s' % a,
-                          'target': '(?P<target>.*)',
-                          'damage': r'[^,]*(?P<damage>\d+\.\d+)? damage' })
+                          'target': '(?P<target>.*?)',
+                          'damage': r'[^,]*?(?P<damage>\d+\.\d+)? damage' })
         for vp in __VERB_PHRASES
         for a in __ATTACKER_PATTERNS
         ]
@@ -180,9 +192,11 @@ class CombatLogEntry(LogEntry):
         self._target = m.group('target')
         self._attacker = m.group('attacker')
         self._weapon = m.group('weapon')
-        self._damage = m.group('damage')
-        if self._damage is None:
+        damage = m.group('damage')
+        if damage is None:
             self._damage = 0
+        else:
+            self._damage = float(damage)
 
 
 class Log(object):
@@ -190,7 +204,27 @@ class Log(object):
     def __init__(self, listener, start_time, log_entries):
         self._listener = listener
         self._start_time = start_time
-        self.log_entries = list(log_entries)
+        self._log_entries = list(log_entries)
+
+    @property
+    def listener(self):
+        """The character for whom this log was recorded. May be 'Unknown'."""
+        return self._listener
+
+    @property
+    def start_time(self):
+        """A datetime.datetime indicating the time recording started."""
+        return self._start_time
+
+    @property
+    def log_entries(self):
+        """An iterator to a sequence of LogEntry objects in timestamp order."""
+        return iter(self._log_entries)
+
+    @property
+    def num_entries(self):
+        """The number of entries in this log."""
+        return len(self._log_entries)
 
     @classmethod
     def parse_log(cls, log_file):
@@ -234,7 +268,7 @@ class Log(object):
             maybe_listener_line = infile.next().rstrip()
             m = cls.__LISTENER_RE.search(maybe_listener_line)
             if m is None:
-                listener = 'Unknown'
+                listener = None
                 session_start_line = maybe_listener_line
             else:
                 listener = m.group(1)
@@ -257,7 +291,7 @@ if __name__ == '__main__':
     for filename in sys.argv[1:]:
         try:
             log = Log.parse_log(filename)
-            print 'Log %s had %d lines.' % (filename, len(log.log_entries))
+            print 'Log %s had %d entries.' % (filename, log.num_entries)
         except ValueError, e:
             print >>sys.stderr, 'Error parsing %s: %s.' % (filename, e)
 
