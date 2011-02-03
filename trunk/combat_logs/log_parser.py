@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# Copyright 2010 Matt Rudary (ruds@boxbe.com)
+# Copyright 2010 Matt Rudary
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -190,7 +190,7 @@ class Log(object):
     def __init__(self, listener, start_time, log_entries):
         self._listener = listener
         self._start_time = start_time
-        self._log_entries = list(log_entries)
+        self.log_entries = list(log_entries)
 
     @classmethod
     def parse_log(cls, log_file):
@@ -257,7 +257,7 @@ if __name__ == '__main__':
     for filename in sys.argv[1:]:
         try:
             log = Log.parse_log(filename)
-            print 'Log %s had %d lines.' % (filename, len(log._log_entries))
+            print 'Log %s had %d lines.' % (filename, len(log.log_entries))
         except ValueError, e:
             print >>sys.stderr, 'Error parsing %s: %s.' % (filename, e)
 
