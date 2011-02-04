@@ -4,6 +4,9 @@ It is licensed under the MIT license (See http://jquery.org/license).
 flot was downloaded from http://code.google.com/p/flot/ on 2011/02/03.
 It is licensed under the MIT license.
 
+jquery.form.js was downlaoded from http://jquery.malsup.com/form/ on 2011/02/04.
+It is licensed under the MIT license.
+
 If you'd like to run this parser locally, you may run
 python ../combat_log_analyzer.py LOG_FILE > LOG_FILE.html
 from the local subdirectory.
