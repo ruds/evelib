@@ -95,4 +95,5 @@ $(document).ready(
           }
         }
       });
+    $('#upload_form').css('visibility', 'visible');
   });

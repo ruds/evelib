@@ -10,8 +10,10 @@
     <script type="text/javascript" src="static/display_plots.js"></script>
   </head>
   <body>
+    <noscript>You must enable Javascript to use this page.</noscript>
     <form id="upload_form" action="/parse_file"
-          enctype="multipart/form-data" method="post">
+          enctype="multipart/form-data" method="post"
+          style="visibility: hidden">
       <fieldset>
         <legend>Upload a Gamelog file:</legend>
         <input type="file" name="logfile">
@@ -33,5 +35,10 @@
       the <a href="http://code.google.com/p/flot/">Flot</a>
       and <a href="http://jquery.malsup.com/form/">Form</a> plugins for
       jQuery.</p>
+    <p>Bug?
+      <a href="http://www.scrapheap-challenge.com/privmsg.php?mode=post&u=154">
+        Send me a PM on Scrapheap Challenge</a>. Please include your
+        browser and OS information and paste in the log file that
+        didn't display properly.</p>
   </body>
 </html>
