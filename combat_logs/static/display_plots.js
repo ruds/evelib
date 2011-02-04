@@ -62,6 +62,7 @@ var make_plot = function(selector, log_data, you_field, enemy_field, min, max) {
                     min: min,
                     max: max
                   },
+           yaxis: { min: 0 },
            legend: { position: 'nw' }
          });
 };
@@ -86,8 +87,12 @@ $(document).ready(
           $('#upload_status').html('Processing...');
         },
         success: function(data) {
-          render(data);
-          $('#upload_status').html('');
+          if (data.error) {
+            $('#upload_status').html('<pre>' + data.error + '</pre>');
+          } else {
+            render(data);
+            $('#upload_status').html('');
+          }
         }
       });
   });

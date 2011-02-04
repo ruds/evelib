@@ -42,6 +42,7 @@ class ParseFile(webapp.RequestHandler):
         try:
             parsed = log_parser.Log.parse_log(logfile)
         except ValueError, e:
+            logging.error('Could not parse file: %s' % log_content)
             self.response.out.write(simplejson.dumps(
                     { 'error': "Can't parse file: %s" % e }))
             return

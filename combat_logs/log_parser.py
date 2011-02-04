@@ -21,6 +21,7 @@ with the wrong character.
 """
 
 import datetime
+import itertools
 import re
 import sys
 
@@ -246,8 +247,9 @@ class Log(object):
 
         try:
             listener, timestamp = cls.__read_header(infile)
-            return Log(listener, timestamp,
-                       (LogEntry.parse_line(l.rstrip()) for l in infile))
+            return Log(listener, timestamp, itertools.ifilter(
+                    None, (LogEntry.parse_line(l.rstrip()) for l in infile)))
+                              
         finally:
             infile.close()
 
