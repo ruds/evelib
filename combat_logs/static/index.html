@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Combat Log Analyzer</title>
+    <link href="static/style.css" type="text/css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.js"></script>
+    <script type="text/javascript" src="static/flot/jquery.flot.js"></script>
+    <script type="text/javascript" src="static/jquery.form.js"></script>
+    <script type="text/javascript" src="static/display_plots.js"></script>
+  </head>
+  <body>
+    <form id="upload_form" action="/parse_file"
+          enctype="multipart/form-data" method="post">
+      <fieldset>
+        <legend>Upload a Gamelog file:</legend>
+        <input type="file" name="logfile">
+        <input type="submit" value="Graph it!">
+        <div id="upload_status"></div>
+      </fieldset>
+    </form>
+    <div class="graphblock">
+      <h1>Your DPS</h1>
+      <div id="attack"></div>
+    </div>
+    <div class="graphblock">
+      <h1>Enemy DPS</h1>
+      <div id="defense"></div>
+    </div>
+    <p>Written by Matt Rudary (aka Ruds Snikja).
+      Powered by <a href="http://code.google.com/appengine">Google
+        App Engine</a>, <a href="http://jquery.com/">jQuery</a>, and
+      the <a href="http://code.google.com/p/flot/">Flot</a>
+      and <a href="http://jquery.malsup.com/form/">Form</a> plugins for
+      jQuery.</p>
+  </body>
+</html>

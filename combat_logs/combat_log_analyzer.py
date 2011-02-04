@@ -15,9 +15,7 @@
 """Library to analyze Eve combat logs."""
 
 import datetime
-import json
 import re
-import sys
 import time
 
 import log_parser
@@ -200,7 +198,7 @@ def extract_streams(log):
     return damage_streams
 
 
-def _serialize(obj):
+def serialize(obj):
     if isinstance(obj, datetime.datetime):
         return time.mktime(obj.timetuple()) * 1000
     elif isinstance(obj, DamageStream):
@@ -212,8 +210,10 @@ def _serialize(obj):
 
 
 if __name__ == '__main__':
+    import json
+    import sys
     html_template = open('template.html', 'r').read()
     log = log_parser.Log.parse_log(sys.argv[1])
     streams = extract_streams(log)
-    data = json.dumps(streams, default=_serialize)
+    data = json.dumps(streams, default=serialize)
     print html_template % { 'json': data }
