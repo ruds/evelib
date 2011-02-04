@@ -212,6 +212,8 @@ def _serialize(obj):
 
 
 if __name__ == '__main__':
+    html_template = open('template.html', 'r').read()
     log = log_parser.Log.parse_log(sys.argv[1])
     streams = extract_streams(log)
-    print json.dumps(streams, sort_keys=True, indent=4, default=_serialize)
+    data = json.dumps(streams, default=_serialize)
+    print html_template % { 'json': data }
