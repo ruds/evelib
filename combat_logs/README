@@ -5,6 +5,7 @@ flot was downloaded from http://code.google.com/p/flot/ on 2011/02/03.
 It is licensed under the MIT license.
 
 If you'd like to run this parser locally, you may run
-python combat_log_analyzer.py LOG_FILE > LOG_FILE.html
+python ../combat_log_analyzer.py LOG_FILE > LOG_FILE.html
+from the local subdirectory.
 
 Then open LOG_FILE.html in your browser to view the graph!
