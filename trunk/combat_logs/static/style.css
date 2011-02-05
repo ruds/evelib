@@ -10,6 +10,14 @@ div.graphblock {
     height: 40%;
 }
 
+form {
+    display: inline;
+}
+
+fieldset {
+    display: inline;
+}
+
 .graphblock h1 {
     font-size: large;
 }
