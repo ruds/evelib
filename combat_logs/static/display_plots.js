@@ -11,7 +11,7 @@
 // limitations under the License.
 //
 
-var SMOOTHING_FACTOR = 10;  // seconds
+var SMOOTHING_FACTOR = 5;  // seconds -- half-width of smoothing
 
 var smooth = function(damage_stream, factor) {
   var base = damage_stream.start_time;
@@ -20,12 +20,13 @@ var smooth = function(damage_stream, factor) {
   var running_sum = 0;
   for (var i = 0; i < stream.length; i++) {
     while (lead < damage_stream.damage.length &&
-           damage_stream.damage[lead][0] - base <= i * 1000) {
+           damage_stream.damage[lead][0] - base
+           <= (i + SMOOTHING_FACTOR) * 1000) {
       running_sum += damage_stream.damage[lead][1];
       lead += 1;
     }
     while (trail < damage_stream.damage.length &&
-           (damage_stream.damage[trail][0] - base)
+           damage_stream.damage[trail][0] - base
            <= (i - SMOOTHING_FACTOR) * 1000) {
       running_sum -= damage_stream.damage[trail][1];
       trail += 1;
@@ -105,4 +106,5 @@ $(document).ready(
       });
     $('#upload_form').css('visibility', 'visible');
     $('#show_legend').change(function() { render(log_data); });
+    $(window).resize(function() { render(log_data); });
   });
