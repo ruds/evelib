@@ -158,10 +158,12 @@ class CombatLogEntry(LogEntry):
                             '(?P<weapon>.*?) belonging to (?P<attacker>.*?)',
                             '(?P<attacker>.*?)(?P<weapon>)' ]
 
+    __DAMAGE_PATTERN = r'[^,]*?(?P<damage>\d+\.\d+)?(?:</b>)? damage'
+
     __VERB_PHRASE_RES = [
         re.compile(vp % { 'attacker': '(?:<color[^>]*>)?%s' % a,
                           'target': '(?P<target>.*?)',
-                          'damage': r'[^,]*?(?P<damage>\d+\.\d+)? damage' })
+                          'damage': __DAMAGE_PATTERN })
         for vp in __VERB_PHRASES
         for a in __ATTACKER_PATTERNS
         ]
