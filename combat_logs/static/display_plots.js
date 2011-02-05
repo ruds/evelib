@@ -56,14 +56,17 @@ var extract_plots = function(log_data, you_field, enemy_field) {
   return plots;
 };
 
-var make_plot = function(selector, log_data, you_field, enemy_field, min, max) {
+var make_plot = function(selector, log_data, you_field, enemy_field,
+                         min, max, show_legend) {
   $.plot($(selector), extract_plots(log_data, you_field, enemy_field),
          { xaxis: { mode: 'time',
                     min: min,
                     max: max
                   },
            yaxis: { min: 0 },
-           legend: { position: 'nw' }
+           legend: { position: 'nw',
+                     show: show_legend
+                   }
          });
 };
 
@@ -74,9 +77,12 @@ var render = function(log_data) {
   var max = Math.max.apply(
     null,
     $.map(log_data, function (val) { return val.end_time; }));
-  make_plot('#attack', log_data, 'attacker', 'target', min, max);
-  make_plot('#defense', log_data, 'target', 'attacker', min, max);
+  var show_legend = $('#show_legend:checked').val() == 'show';
+  make_plot('#attack', log_data, 'attacker', 'target', min, max, show_legend);
+  make_plot('#defense', log_data, 'target', 'attacker', min, max, show_legend);
 };
+
+var log_data = [];
 
 $(document).ready(
   function() {
@@ -91,10 +97,12 @@ $(document).ready(
           if (data.error) {
             $out.html('<pre>' + data.error + '</pre>');
           } else {
+            log_data = data.arr;
             render(data.arr);
             $out.html('');
           }
         }
       });
     $('#upload_form').css('visibility', 'visible');
+    $('#show_legend').change(function() { render(log_data); });
   });
