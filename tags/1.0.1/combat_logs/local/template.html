@@ -1,0 +1,18 @@
+<!doctype html>
+<html style="height: 100%%;">
+  <head>
+    <meta charset="utf-8">
+    <title>Combat Log Analyzer</title>
+    <script type="text/javascript" src="jquery-1.5.js"></script>
+    <script type="text/javascript" src="flot/jquery.flot.js"></script>
+  </head>
+  <body style="height: 100%%;">
+    <h1>Combat Log Analyzer</h1>
+    <div id="attack" style="width:90%%;height:40%%;"></div>
+    <div id="defense" style="width:90%%;height:40%%;"></div>
+    <script type="text/javascript">
+      var data = %(json)s;
+    </script>
+    <script type="text/javascript" src="display_plots.js"></script>
+  </body>
+</html>
