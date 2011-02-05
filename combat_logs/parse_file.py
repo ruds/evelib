@@ -38,17 +38,16 @@ class ParseFile(webapp.RequestHandler):
         log_content = self.request.get('logfile')
         logfile = StringIO.StringIO(log_content)
 
-        self.response.headers['Content-Type'] = 'application/json'
+        self.response.headers['Content-Type'] = 'text/html; charset=utf-8'
+        output_obj = {}
         try:
             parsed = log_parser.Log.parse_log(logfile)
+            output_obj['arr'] = combat_log_analyzer.extract_streams(parsed)
         except ValueError, e:
-            logging.error('Could not parse file: %s' % log_content)
-            self.response.out.write(simplejson.dumps(
-                    { 'error': "Can't parse file: %s" % e }))
-            return
-        data = simplejson.dumps(combat_log_analyzer.extract_streams(parsed),
-                                cls=CustomJSONEncoder)
-        self.response.out.write(data)
+            logging.error('Could not parse file: %s\n%s' % (e, log_content))
+            output_obj['error'] = "Can't parse file: %s" % e
+        data = simplejson.dumps(output_obj, cls=CustomJSONEncoder)
+        self.response.out.write('<textarea>\n%s\n</textarea>' % data)
 
 
 application = webapp.WSGIApplication([('/parse_file', ParseFile)], debug=True)

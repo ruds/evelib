@@ -87,11 +87,12 @@ $(document).ready(
           $('#upload_status').html('Processing...');
         },
         success: function(data) {
+          var $out = $('#upload_status');
           if (data.error) {
-            $('#upload_status').html('<pre>' + data.error + '</pre>');
+            $out.html('<pre>' + data.error + '</pre>');
           } else {
-            render(data);
-            $('#upload_status').html('');
+            render(data.arr);
+            $out.html('');
           }
         }
       });
