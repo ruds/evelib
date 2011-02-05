@@ -22,8 +22,9 @@ fieldset {
     display: inline;
 }
 
-.graphblock h1 {
-    font-size: large;
+.graphblock h1 { 
+   font-size: large;
+   margin-bottom: 5px;
 }
 
 #attack {

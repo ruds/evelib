@@ -154,15 +154,16 @@ $(document).ready(
             log_data = data.arr;
             render(data.arr);
             $out.html('');
+            $('#download_form').css('visibility', 'visible');
           }
         }
       });
     $('#upload_form').css('visibility', 'visible');
     $('#show_legend').change(function() { render(log_data); });
     $(window).resize(function() { render(log_data); });
-    $("#download").click(
+    $("#download_button").click(
       function() {
-        window.open("data:text/plain," + encodeURIComponent(make_csv(log_data)),
-                    'damage.csv');
+        $("#download_content").val(make_csv(log_data));
+        $('#download_form').submit();
       });
   });

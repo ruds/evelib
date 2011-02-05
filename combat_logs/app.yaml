@@ -15,6 +15,9 @@ handlers:
 - url: /parse_file
   script: parse_file.py
 
+- url: /save_data
+  script: save_data.py
+
 - url: /static/(.*)\.js
   static_files: static/\1.js
   upload: static/(.*)\.js

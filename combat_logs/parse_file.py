@@ -50,7 +50,7 @@ class ParseFile(webapp.RequestHandler):
         self.response.out.write('<textarea>\n%s\n</textarea>' % data)
 
 
-application = webapp.WSGIApplication([('/parse_file', ParseFile)], debug=True)
+application = webapp.WSGIApplication([('/parse_file', ParseFile)])
 
 
 def main():
