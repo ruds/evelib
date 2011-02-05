@@ -31,7 +31,7 @@ var smooth = function(damage_stream, factor) {
       running_sum -= damage_stream.damage[trail][1];
       trail += 1;
     }
-    stream[i] = [base + i * 1000, running_sum / SMOOTHING_FACTOR];
+    stream[i] = [base + i * 1000, running_sum / (2 * SMOOTHING_FACTOR)];
   }
   return stream;
 };
@@ -55,6 +55,59 @@ var extract_plots = function(log_data, you_field, enemy_field) {
            }
          });
   return plots;
+};
+
+var date_string = function(time_msec) {
+  var d = new Date(time_msec);
+  return ([d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()].join('/')
+          + ' '
+          + [d.getUTCHours(), d.getUTCMinutes(), d.getUTCSeconds()].join(':'));
+};
+
+var make_csv = function(log_data) {
+  var row = ['time'];
+  $.each(log_data,
+         function(idx, val) {
+           if (val.target == 'You') {
+             row.push('"attacker: ' + make_label(val, val.attacker) + '"');
+           } else {
+             row.push('"target: ' + make_label(val, val.target) + '"');
+           }
+         });
+  var all_rows = [row.join(',')];
+
+  // iterators into each of the lists
+  var idx = new Array(log_data.length);
+  // the current timestamp in each of the lists
+  var cur = new Array(log_data.length);
+  $.each(log_data, function (i) { idx[i] = 0;
+                                  cur[i] = log_data[i].damage[0][0];});
+  // the working timestamp
+  var working = Math.min.apply(null, cur);
+  while (isFinite(working)) {
+    row = [date_string(working)];
+    $.each(log_data,
+           function(i, val) {
+             if (idx[i] < val.damage.length) {
+               if (val.damage[idx[i]][0] == working) {
+                 row.push(val.damage[idx[i]][1]);
+                 idx[i] += 1;
+                 if (idx[i] < val.damage.length) {
+                   cur[i] = val.damage[idx[i]][0];
+                 } else {
+                   cur[i] = Number.POSITIVE_INFINITY;
+                 }
+               } else {
+                 row.push('');
+               }
+             } else {
+               row.push('');
+             }
+           });
+    all_rows.push(row.join(','));
+    working = Math.min.apply(null, cur);
+  }
+  return all_rows.join('\n');
 };
 
 var make_plot = function(selector, log_data, you_field, enemy_field,
@@ -107,4 +160,9 @@ $(document).ready(
     $('#upload_form').css('visibility', 'visible');
     $('#show_legend').change(function() { render(log_data); });
     $(window).resize(function() { render(log_data); });
+    $("#download").click(
+      function() {
+        window.open("data:text/plain," + encodeURIComponent(make_csv(log_data)),
+                    'damage.csv');
+      });
   });
