@@ -41,10 +41,13 @@
       <h1>Enemy DPS</h1>
       <div id="defense"></div>
     </div>
-    <form>
-    Download data as CSV:
-    <input type="button" id="download" value="Download">
-    (not supported in IE 8 or lower).
+    <form id="download_form" action="/save_data" method="post"
+          style="visibility: hidden">
+      <input type="hidden" name="content" id="download_content" value="">
+      <input type="hidden" name="content_type" value="text/csv">
+      <input type="hidden" name="filename" value="damage.csv">
+      <label for="download_button">Download data as CSV:</label>
+      <input type="button" id="download_button" value="Download">
     </form>
     <p>Written by Matt Rudary (aka Ruds Snikja).
       Powered by <a href="http://code.google.com/appengine">Google
