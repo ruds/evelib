@@ -39,6 +39,7 @@ class DamageStream(object):
         self._ticker = ticker
         self._weapon = weapon or 'Unknown'
         self._enemy_ships = ', '.join(enemy_ships) or 'Unknown'
+        self._total_damage = sum(d[1] for d in self._damage)
         if self._damage:
             self._start_time = self._damage[0][0]
             self._end_time = self._damage[-1][0]
@@ -72,6 +73,10 @@ class DamageStream(object):
         return iter(self._damage)
 
     @property
+    def total_damage(self):
+        return self._total_damage
+
+    @property
     def enemy_ships(self):
         """A string containing a list of ships used by the enemy or Unknown."""
         return self._enemy_ships
@@ -97,6 +102,7 @@ class DamageStream(object):
             'enemy_ships': self.enemy_ships,
             'start_time': self.start_time,
             'end_time': self.end_time,
+            'total_damage': self.total_damage,
             }
 
 
