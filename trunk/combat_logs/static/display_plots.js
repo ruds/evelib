@@ -42,6 +42,7 @@ var make_label = function(damage_stream, enemy) {
           + (damage_stream.weapon == 'Unknown'
              ? ''
              : ' ' + damage_stream.weapon)
+          + ' ' + damage_stream.total_damage + 'dmg'
           + ' [' + damage_stream.enemy_ships + ']');
 };
 
