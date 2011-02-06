@@ -181,27 +181,12 @@ class CombatLogEntry(LogEntry):
         for a in __ATTACKER_PATTERNS
         ]
 
-    __stats = [0] * len(__VERB_PHRASE_RES)
-
-    @classmethod
-    def print_stats(cls):
-        """Print statistics about types of log entries."""
-        stats_table = zip(cls.__stats, ((vp, a)
-                                        for vp in cls.__VERB_PHRASES
-                                        for a in cls.__ATTACKER_PATTERNS))
-        print 'Count\tVerb Phrase\n\tAttacker Phrase\n'
-        for count, (vp, a) in stats_table:
-            print '%d\t%s\n\t%s\n' % (count, vp, a)
-
     def _parse_complex(self):
         m = None
-        i = 0
         for rex in self.__VERB_PHRASE_RES:
             m = rex.match(self._data)
             if m is not None:
-                CombatLogEntry.__stats[i] += 1
                 break
-            i += 1
         if m is None:
             raise ValueError('Could not parse """%s""".' % self._data)
 
@@ -353,6 +338,4 @@ if __name__ == '__main__':
             print 'Log %s had %d entries.' % (filename, log.num_entries)
         except ValueError, e:
             print >>sys.stderr, 'Error parsing %s: %s.' % (filename, e)
-
-    CombatLogEntry.print_stats()
 
