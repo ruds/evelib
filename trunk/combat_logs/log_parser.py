@@ -78,7 +78,7 @@ class LogEntry(object):
         % _TIMESTAMP_PATTERN)
 
     @classmethod
-    def parse_line(cls, line):
+    def parse_line(cls, line, log):
         """Parse the given line and return a LogEntry.
 
         Returns None if the current line does not start with a timestamp
@@ -95,7 +95,7 @@ class LogEntry(object):
         timestamp = datetime.datetime(y, mo, d, h, mi, s, tzinfo = UTC())
         data = m.group('data')
         if entry_type == 'combat':
-            return CombatLogEntry(timestamp, data)
+            return CombatLogEntry(timestamp, data, log)
         else:
             if entry_type == 'info':
                 t = LogEntry.INFO
@@ -115,9 +115,9 @@ class LogEntry(object):
 
 
 class CombatLogEntry(LogEntry):
-    def __init__(self, timestamp, data):
+    def __init__(self, timestamp, data, log):
         LogEntry.__init__(self, timestamp, LogEntry.COMBAT, data)
-        self._parse_data()
+        self._parse_data(log)
 
     @property
     def target(self):
@@ -138,6 +138,19 @@ class CombatLogEntry(LogEntry):
     def damage(self):
         """The amount of damage dealt by this attack."""
         return self._damage
+
+    def _parse_data(self, log):
+        if log.log_type == Log.COMPLEX:
+            self._parse_complex()
+        elif log.log_type == Log.SIMPLIFIED:
+            self._parse_simple()
+        else:
+            try:
+                self._parse_simple()
+                log.log_type = Log.SIMPLIFIED
+            except ValueError:
+                self._parse_complex()
+                log.log_type = Log.COMPLEX
 
     __VERB_PHRASES = [
         '%(attacker)s (?:lightly |heavily )?hits %(target)s, %(damage)s\.$',
@@ -180,7 +193,7 @@ class CombatLogEntry(LogEntry):
         for count, (vp, a) in stats_table:
             print '%d\t%s\n\t%s\n' % (count, vp, a)
 
-    def _parse_data(self):
+    def _parse_complex(self):
         m = None
         i = 0
         for rex in self.__VERB_PHRASE_RES:
@@ -201,13 +214,56 @@ class CombatLogEntry(LogEntry):
         else:
             self._damage = float(damage)
 
+    __SIMPLIFIED_PHRASES = [
+        '(?P<attacker>.*) hits (?P<target>you) for %(simple_damage)s$',
+        '(?P<weapon>.*) hits (?P<target>.*) for %(simple_damage)s$',
+        '(?P<attacker>.*) misses (?P<target>you)(?P<damage>)$',
+        '(?P<weapon>.*) misses (?P<target>[^.]*)(?P<damage>)$',
+        ]
+
+    __SIMPLIFIED_PHRASE_RES = [
+        re.compile(sp % {
+                'simple_damage': ('<b>(?P<damage>\d+)</b> damage'
+                                  '(?: \(Wrecking!\))?') })
+        for sp in __SIMPLIFIED_PHRASES
+        ]
+
+    def _parse_simple(self):
+        m = None
+        for rex in self.__SIMPLIFIED_PHRASE_RES:
+            m = rex.match(self._data)
+            if m is not None:
+                break
+        if m is None:
+            raise ValueError('Could not parse """%s""".' % self._data)
+
+        self._target = m.group('target')
+        if self._target == 'you':
+            self._attacker = m.group('attacker')
+            self._weapon = ''
+        else:
+            self._attacker = 'You'
+            self._weapon = m.group('weapon')
+        damage = m.group('damage')
+        if damage:
+            self._damage = int(damage)
+        else:
+            self._damage = 0
+
 
 class Log(object):
+    # Log types:
+    UNKNOWN = 0
+    COMPLEX = 1
+    SIMPLIFIED = 2
+
     """A log consists of some metadata and a sequence of log entries."""
-    def __init__(self, listener, start_time, log_entries):
+    def __init__(self, listener, start_time, infile):
         self._listener = listener
         self._start_time = start_time
-        self._log_entries = list(log_entries)
+        self.log_type = Log.UNKNOWN
+        self._log_entries = [LogEntry.parse_line(l.rstrip(), self)
+                             for l in infile]
 
     @property
     def listener(self):
@@ -249,8 +305,7 @@ class Log(object):
 
         try:
             listener, timestamp = cls.__read_header(infile)
-            return Log(listener, timestamp, itertools.ifilter(
-                    None, (LogEntry.parse_line(l.rstrip()) for l in infile)))
+            return Log(listener, timestamp, itertools.ifilter(None, infile))
                               
         finally:
             infile.close()

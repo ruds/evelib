@@ -16,6 +16,7 @@
 
 import logging
 import StringIO
+import traceback
 
 from django.utils import simplejson
 from google.appengine.ext import webapp
@@ -45,6 +46,7 @@ class ParseFile(webapp.RequestHandler):
             output_obj['arr'] = combat_log_analyzer.extract_streams(parsed)
         except ValueError, e:
             logging.error('Could not parse file: %s\n%s' % (e, log_content))
+            logging.error(traceback.format_exc(e))
             output_obj['error'] = "Can't parse file: %s" % e
         data = simplejson.dumps(output_obj, cls=CustomJSONEncoder)
         self.response.out.write('<textarea>\n%s\n</textarea>' % data)
