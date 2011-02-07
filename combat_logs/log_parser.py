@@ -200,10 +200,13 @@ class CombatLogEntry(LogEntry):
             self._damage = float(damage)
 
     __SIMPLIFIED_PHRASES = [
-        '(?P<attacker>.*) hits (?P<target>you) for %(simple_damage)s$',
-        '(?P<weapon>.*) hits (?P<target>.*) for %(simple_damage)s$',
+        ('(?P<attacker>.*) (?:hits|strikes) (?P<target>you) '
+         'for %(simple_damage)s$'),
+        '(?P<weapon>.*) (?:hits|strikes) (?P<target>.*) for %(simple_damage)s$',
         '(?P<attacker>.*) misses (?P<target>you)(?P<damage>)$',
         '(?P<weapon>.*) misses (?P<target>[^.]*)(?P<damage>)$',
+        '(?P<attacker>.*) miss (?P<target>you)(?P<damage>)$',
+        '(?P<weapon>.*) miss (?P<target>[^.]*)(?P<damage>)$',
         ]
 
     __SIMPLIFIED_PHRASE_RES = [
