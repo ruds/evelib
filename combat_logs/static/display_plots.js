@@ -46,11 +46,13 @@ var make_label = function(damage_stream, enemy) {
           + ' [' + damage_stream.enemy_ships + ']');
 };
 
-var extract_plots = function(log_data, you_field, enemy_field) {
+var extract_plots = function(log_data, you_field, enemy_field, min, max) {
   var plots = [];
   $.each(log_data,
          function(idx, val) {
-           if (val[you_field] == 'You') {
+           if (val.start_time <= max
+               && val.end_time >= min
+               && val[you_field] == 'You') {
              plots.push({ label: make_label(val, val[enemy_field]),
                           data: smooth(val, SMOOTHING_FACTOR) });
            }
@@ -113,31 +115,45 @@ var make_csv = function(log_data) {
 
 var make_plot = function(selector, log_data, you_field, enemy_field,
                          min, max, show_legend) {
-  $.plot($(selector), extract_plots(log_data, you_field, enemy_field),
+  $.plot($(selector), extract_plots(log_data, you_field, enemy_field, min, max),
          { xaxis: { mode: 'time',
                     min: min,
                     max: max
                   },
            yaxis: { min: 0 },
+           selection: { mode: "x" },
            legend: { position: 'nw',
                      show: show_legend
                    }
          });
 };
 
-var render = function(log_data) {
-  var min = Math.min.apply(
-    null,
-    $.map(log_data, function (val) { return val.start_time; }));
-  var max = Math.max.apply(
-    null,
-    $.map(log_data, function (val) { return val.end_time; }));
+var render = function() {
   var show_legend = $('#show_legend:checked').val() == 'show';
   make_plot('#attack', log_data, 'attacker', 'target', min, max, show_legend);
   make_plot('#defense', log_data, 'target', 'attacker', min, max, show_legend);
 };
 
+var handle_selection = function(event, ranges) {
+  min = ranges.xaxis.from;
+  max = ranges.xaxis.to;
+  $('#zoom_out_button').attr('disabled', '');
+  render();
+};
+
+var reset_boundaries = function() {
+  $('#zoom_out_button').attr('disabled', 'disabled');
+  min = Math.min.apply(
+    null,
+    $.map(log_data, function (val) { return val.start_time; }));
+  max = Math.max.apply(
+    null,
+    $.map(log_data, function (val) { return val.end_time; }));
+};
+
 var log_data = [];
+var min = 0;
+var max = Infinity;
 
 $(document).ready(
   function() {
@@ -153,16 +169,20 @@ $(document).ready(
             $out.html('<pre>' + data.error + '</pre>');
           } else {
             log_data = data.arr;
-            render(data.arr);
+            reset_boundaries();
+            render();
             $out.html('');
             $('#download_form').css('visibility', 'visible');
           }
         }
       });
     $('#upload_form').css('visibility', 'visible');
-    $('#show_legend').change(function() { render(log_data); });
-    $(window).resize(function() { render(log_data); });
-    $("#download_button").click(
+    $('#show_legend').change(function() { render(); });
+    $('#zoom_out_button').click(function() { reset_boundaries(); render(); });
+    $('#zoom_out_button').attr('disabled', 'disabled');
+    $('.graphblock > div').bind('plotselected', handle_selection);
+    $(window).resize(function() { render(); });
+    $('#download_button').click(
       function() {
         $("#download_content").val(make_csv(log_data));
         $('#download_form').submit();
