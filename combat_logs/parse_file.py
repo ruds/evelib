@@ -44,6 +44,10 @@ class ParseFile(webapp.RequestHandler):
         try:
             parsed = log_parser.Log.parse_log(logfile)
             output_obj['arr'] = combat_log_analyzer.extract_streams(parsed)
+            if parsed.listener:
+                output_obj['Your'] = parsed.listener
+            else:
+                output_obj['Your'] = 'Your'
         except ValueError, e:
             logging.error('Could not parse file: %s\n%s' % (e, log_content))
             logging.error(traceback.format_exc(e))
