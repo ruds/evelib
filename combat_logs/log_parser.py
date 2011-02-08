@@ -200,13 +200,14 @@ class CombatLogEntry(LogEntry):
             self._damage = float(damage)
 
     __SIMPLIFIED_PHRASES = [
-        ('(?P<attacker>.*) (?:hits|strikes) (?P<target>you) '
+        ('(?:<color[^>]*>)?(?P<attacker>.*) (?:hits|strikes) (?P<target>you) '
          'for %(simple_damage)s$'),
-        '(?P<weapon>.*) (?:hits|strikes) (?P<target>.*) for %(simple_damage)s$',
-        '(?P<attacker>.*) misses (?P<target>you)(?P<damage>)$',
-        '(?P<weapon>.*) misses (?P<target>[^.]*)(?P<damage>)$',
-        '(?P<attacker>.*) miss (?P<target>you)(?P<damage>)$',
-        '(?P<weapon>.*) miss (?P<target>[^.]*)(?P<damage>)$',
+        ('(?:<color[^>]*>)?(?P<weapon>.*) (?:hits|strikes) (?P<target>.*) '
+         'for %(simple_damage)s$'),
+        '(?:<color[^>]*>)?(?P<attacker>.*) misses (?P<target>you)(?P<damage>)$',
+        '(?:<color[^>]*>)?(?P<weapon>.*) misses (?P<target>[^.]*)(?P<damage>)$',
+        '(?:<color[^>]*>)?(?P<attacker>.*) miss (?P<target>you)(?P<damage>)$',
+        '(?:<color[^>]*>)?(?P<weapon>.*) miss (?P<target>[^.]*)(?P<damage>)$',
         ]
 
     __SIMPLIFIED_PHRASE_RES = [
@@ -250,8 +251,9 @@ class Log(object):
         self._listener = listener
         self._start_time = start_time
         self.log_type = Log.UNKNOWN
-        self._log_entries = [LogEntry.parse_line(l.rstrip(), self)
-                             for l in infile]
+        self._log_entries = list(itertools.ifilter(
+            None,
+            (LogEntry.parse_line(l.rstrip(), self) for l in infile)))
 
     @property
     def listener(self):
@@ -293,8 +295,7 @@ class Log(object):
 
         try:
             listener, timestamp = cls.__read_header(infile)
-            return Log(listener, timestamp, itertools.ifilter(None, infile))
-                              
+            return Log(listener, timestamp, infile)
         finally:
             infile.close()
 
