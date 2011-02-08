@@ -168,6 +168,7 @@ $(document).ready(
           if (data.error) {
             $out.html('<pre>' + data.error + '</pre>');
           } else {
+            $('#your_dps_h1').html(data.Your + ' DPS');
             log_data = data.arr;
             reset_boundaries();
             render();
