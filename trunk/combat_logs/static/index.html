@@ -9,9 +9,14 @@
                         src="static/flot/excanvas.min.js"></script><![endif]-->
     <script type="text/javascript"
             src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
-    <script type="text/javascript" src="static/flot/jquery.flot.js"></script>
-    <script type="text/javascript" src="static/jquery.form.js"></script>
-    <script type="text/javascript" src="static/display_plots.js"></script>
+    <script type="text/javascript"
+            src="static/flot/jquery.flot.js"></script>
+    <script type="text/javascript"
+            src="static/flot/jquery.flot.selection.js"></script>
+    <script type="text/javascript"
+            src="static/jquery.form.js"></script>
+    <script type="text/javascript"
+            src="static/display_plots.js"></script>
   </head>
   <body>
     <noscript>You must enable Javascript to use this page.</noscript>
@@ -31,10 +36,11 @@
         <label for="show_legend">Show Legend</label>
         <input type="checkbox" id="show_legend" value="show"
                checked="checked">
+        <input type="button" id="zoom_out_button" value="Zoom Out">
       </fieldset>
     </form>
     <div class="graphblock">
-      <h1>Your DPS</h1>
+      <h1 id="your_dps_h1">Your DPS</h1>
       <div id="attack"></div>
     </div>
     <div class="graphblock">
