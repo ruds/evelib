@@ -1,7 +1,12 @@
-application: eve-combat-logs
-version: 1-1
-runtime: python
+application: eve-combat-logs-hrd
+version: 1-2
+runtime: python27
 api_version: 1
+threadsafe: false
+
+libraries:
+- name: django
+  version: "1.4"
 
 handlers:
 - url: /
